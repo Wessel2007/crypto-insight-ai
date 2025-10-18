@@ -1,0 +1,15 @@
+version: '3.8'
+
+services:
+  crypto-insight-api:
+    build: .
+    container_name: crypto-insight-ai
+    ports:
+      - "8000:8000"
+    environment:
+      - ENVIRONMENT=production
+      - DEBUG=false
+    restart: unless-stopped
+    # volumes:
+    #   - ./app:/app/app  # Descomente para desenvolvimento com hot-reload
+
