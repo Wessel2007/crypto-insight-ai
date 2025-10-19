@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { createChart, ColorType } from 'lightweight-charts';
 
 interface CandleData {
@@ -16,13 +16,23 @@ interface CandleData {
 interface CandlestickChartProps {
   data: CandleData[];
   symbol: string;
+  isLoading?: boolean;
 }
 
-const CandlestickChart: React.FC<CandlestickChartProps> = ({ data, symbol }) => {
+const CandlestickChart: React.FC<CandlestickChartProps> = ({ data, symbol, isLoading = false }) => {
   const chartContainerRef = useRef<HTMLDivElement>(null);
+  const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
     if (!chartContainerRef.current || data.length === 0) return;
+
+    // Fade out antes de atualizar
+    setIsVisible(false);
+
+    // Pequeno delay para permitir fade-out suave
+    const fadeTimeout = setTimeout(() => {
+      setIsVisible(true);
+    }, 150);
 
     const chart = createChart(chartContainerRef.current, {
       layout: {
@@ -161,6 +171,7 @@ const CandlestickChart: React.FC<CandlestickChartProps> = ({ data, symbol }) => 
     window.addEventListener('resize', handleResize);
 
     return () => {
+      clearTimeout(fadeTimeout);
       window.removeEventListener('resize', handleResize);
       chart.remove();
     };
@@ -175,7 +186,7 @@ const CandlestickChart: React.FC<CandlestickChartProps> = ({ data, symbol }) => 
   }
 
   return (
-    <div className="bg-gray-800/50 rounded-xl p-5 border border-gray-700">
+    <div className="bg-gray-800/50 rounded-xl p-5 border border-gray-700 relative">
       <div className="flex items-center justify-between mb-4">
         <h3 className="text-lg font-semibold text-gray-200">Gráfico de Candlestick - {symbol}</h3>
         <div className="flex items-center space-x-4 text-xs">
@@ -193,7 +204,26 @@ const CandlestickChart: React.FC<CandlestickChartProps> = ({ data, symbol }) => 
           </div>
         </div>
       </div>
-      <div ref={chartContainerRef} className="w-full" />
+      
+      {/* Container do gráfico com transição suave */}
+      <div 
+        className={`transition-opacity duration-300 ${isVisible ? 'opacity-100' : 'opacity-0'}`}
+        ref={chartContainerRef}
+      />
+      
+      {/* Indicador de carregamento */}
+      {isLoading && (
+        <div className="absolute inset-0 bg-gray-800/80 backdrop-blur-sm rounded-xl flex items-center justify-center">
+          <div className="flex flex-col items-center space-y-3">
+            <div className="relative">
+              <div className="w-12 h-12 border-4 border-blue-500/30 rounded-full"></div>
+              <div className="absolute top-0 left-0 w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+            </div>
+            <p className="text-blue-300 text-sm font-medium">Carregando gráfico...</p>
+          </div>
+        </div>
+      )}
+      
       <div className="mt-3 text-xs text-gray-500 text-center">
         Timeframe: 4h • Últimos 200 candles • Volume na parte inferior
       </div>

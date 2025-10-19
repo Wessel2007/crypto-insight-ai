@@ -106,18 +106,14 @@ FORMATO ESPERADO:
 Responda APENAS com a análise, sem introduções ou conclusões adicionais."""
 
             # Chama a API Claude com timeout
-            try:
-                message = self.client.messages.create(
-                    model="claude-3-5-sonnet-20241022",
-                    max_tokens=200,
-                    temperature=0.7,
-                    messages=[
-                        {"role": "user", "content": prompt}
-                    ]
-                )
-            except TimeoutError:
-                print(f"⚠️ Timeout ao chamar API Anthropic (>{self.timeout}s)")
-                return self._generate_fallback_comment(indicators, score, symbol)
+            message = self.client.messages.create(
+                model="claude-3-5-sonnet-20241022",
+                max_tokens=200,
+                temperature=0.7,
+                messages=[
+                    {"role": "user", "content": prompt}
+                ]
+            )
             
             # Extrai o texto da resposta
             if not message or not message.content or len(message.content) == 0:
@@ -137,11 +133,9 @@ Responda APENAS com a análise, sem introduções ou conclusões adicionais."""
             
             return comment
             
-        except TimeoutError:
-            print(f"⚠️ Timeout ao gerar comentário com IA")
-            return self._generate_fallback_comment(indicators, score, symbol)
-        except Exception as e:
-            print(f"⚠️ Erro ao gerar comentário com IA: {type(e).__name__} - {e}")
+        except (TimeoutError, Exception) as e:
+            error_type = "Timeout" if isinstance(e, TimeoutError) else type(e).__name__
+            print(f"⚠️ {error_type} ao gerar comentário com IA: {e}")
             return self._generate_fallback_comment(indicators, score, symbol)
     
     def _generate_fallback_comment(self, indicators: Dict[str, Any], score: float, symbol: str) -> str:

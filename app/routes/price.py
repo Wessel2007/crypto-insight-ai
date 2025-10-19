@@ -4,7 +4,7 @@ Rotas para consulta de preços
 from fastapi import APIRouter, HTTPException
 from app.services.crypto_service import CryptoService
 from app.models.schemas import PriceResponse, CandleData
-from typing import List
+from app.routes.helpers import validate_and_normalize_symbol, handle_crypto_service_error
 
 router = APIRouter()
 crypto_service = CryptoService()
@@ -22,30 +22,15 @@ async def get_price(symbol: str):
         Dados dos candles em 1h, 4h e 1d
     """
     try:
-        # Valida símbolo
-        if not symbol or len(symbol) > 20:
-            raise HTTPException(status_code=400, detail="Símbolo inválido")
-        
-        # Normaliza o símbolo
-        try:
-            normalized_symbol = crypto_service.normalize_symbol(symbol)
-        except Exception as e:
-            raise HTTPException(status_code=400, detail=f"Erro ao normalizar símbolo: {str(e)}")
+        # Valida e normaliza o símbolo
+        normalized_symbol = validate_and_normalize_symbol(symbol, crypto_service)
         
         # Busca dados dos timeframes
         timeframes = ['1h', '4h', '1d']
         try:
             data = crypto_service.get_multiple_timeframes(normalized_symbol, timeframes, limit=500)
-        except ValueError as e:
-            raise HTTPException(status_code=400, detail=str(e))
         except Exception as e:
-            error_msg = str(e).lower()
-            if 'network' in error_msg or 'timeout' in error_msg:
-                raise HTTPException(status_code=503, detail=f"Erro de conexão com a exchange: {str(e)}")
-            elif 'exchange' in error_msg:
-                raise HTTPException(status_code=400, detail=f"Erro da exchange: {str(e)}")
-            else:
-                raise HTTPException(status_code=500, detail=f"Erro ao buscar dados: {str(e)}")
+            handle_crypto_service_error(e, symbol, "buscar dados")
         
         # Formata resposta
         result = {

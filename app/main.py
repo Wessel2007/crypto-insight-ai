@@ -29,20 +29,10 @@ app.include_router(analyze.router, tags=["Analysis"])
 
 
 @app.get("/", response_model=HealthResponse)
+@app.get("/health", response_model=HealthResponse)
 async def health_check():
     """
-    Endpoint raiz para verificar se a API está funcionando
-    
-    Returns:
-        Status da API
-    """
-    return {"status": "ok"}
-
-
-@app.get("/health", response_model=HealthResponse)
-async def health():
-    """
-    Endpoint de health check
+    Endpoint de health check para verificar se a API está funcionando
     
     Returns:
         Status da API
