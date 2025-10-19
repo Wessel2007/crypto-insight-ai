@@ -6,7 +6,12 @@ from app.services.crypto_service import CryptoService
 from app.services.indicator_service import IndicatorService
 from app.utils.score_engine import ScoreEngine
 from app.utils.ai_analyzer import generate_ai_comment
-from app.models.schemas import AnalyzeResponse, IndicatorData
+from app.models.schemas import (
+    AnalyzeResponse, IndicatorData, ChartDataResponse, CandleWithEMA,
+    TrendIndicators, MomentumIndicators, VolatilityIndicators, 
+    VolumeIndicators, StrengthIndicators, PriceData, TradeOpportunity
+)
+import pandas as pd
 
 router = APIRouter()
 crypto_service = CryptoService()
@@ -62,21 +67,18 @@ async def analyze_symbol(symbol: str):
             # Prepara dados para o score engine
             timeframes_data[tf] = {
                 'indicators': indicators,
-                'last_close': indicators.get('last_close'),
-                'current_volume': indicators.get('current_volume')
+                'last_close': indicators['price'].get('last_close'),
+                'current_volume': indicators['price'].get('current_volume')
             }
             
-            # Formata indicadores para resposta
+            # Formata indicadores para resposta usando a nova estrutura
             indicators_response[tf] = IndicatorData(
-                rsi=indicators.get('rsi'),
-                ema9=indicators.get('ema9'),
-                ema21=indicators.get('ema21'),
-                ema200=indicators.get('ema200'),
-                volume_ma=indicators.get('volume_ma'),
-                macd=indicators.get('macd'),
-                macd_signal=indicators.get('macd_signal'),
-                macd_histogram=indicators.get('macd_histogram'),
-                atr=indicators.get('atr')
+                trend=TrendIndicators(**indicators['trend']),
+                momentum=MomentumIndicators(**indicators['momentum']),
+                volatility=VolatilityIndicators(**indicators['volatility']),
+                volume=VolumeIndicators(**indicators['volume']),
+                strength=StrengthIndicators(**indicators['strength']),
+                price=PriceData(**indicators['price'])
             )
         
         # Analisa múltiplos timeframes e calcula score
@@ -94,6 +96,53 @@ async def analyze_symbol(symbol: str):
             news=None  # Pode ser integrado com news_fetcher futuramente
         )
         
+        # Analisa oportunidade de trade rápido (timeframe 1h)
+        trade_opportunity = None
+        hourly_data = timeframes_data.get('1h')
+        if hourly_data:
+            trade_analysis = score_engine.analyze_short_term_opportunity(
+                indicators_1h=hourly_data.get('indicators', {}),
+                last_close=hourly_data.get('last_close', 0),
+                current_volume=hourly_data.get('current_volume', 0)
+            )
+            trade_opportunity = TradeOpportunity(
+                probability=trade_analysis['probability'],
+                comment=trade_analysis['comment']
+            )
+        
+        # Prepara dados do gráfico (timeframe de 4h com 200 candles)
+        chart_data = None
+        try:
+            # Usa dados de 4h para o gráfico (bom equilíbrio entre detalhe e visão geral)
+            df_chart = data.get('4h')
+            if df_chart is not None and not df_chart.empty:
+                chart_df = indicator_service.get_chart_data(df_chart, limit=200)
+                
+                # Converte para lista de CandleWithEMA
+                candles_list = []
+                for _, row in chart_df.iterrows():
+                    candle = CandleWithEMA(
+                        time=int(row['timestamp'].timestamp()),  # Converte para timestamp Unix
+                        open=float(row['open']),
+                        high=float(row['high']),
+                        low=float(row['low']),
+                        close=float(row['close']),
+                        volume=float(row['volume']),
+                        ema9=float(row['ema9']) if pd.notna(row['ema9']) else None,
+                        ema21=float(row['ema21']) if pd.notna(row['ema21']) else None,
+                        ema200=float(row['ema200']) if pd.notna(row['ema200']) else None
+                    )
+                    candles_list.append(candle)
+                
+                chart_data = ChartDataResponse(
+                    symbol=normalized_symbol,
+                    timeframe='4h',
+                    candles=candles_list
+                )
+        except Exception as e:
+            # Se houver erro ao preparar dados do gráfico, apenas loga mas não falha a análise
+            print(f"⚠️ Erro ao preparar dados do gráfico: {str(e)}")
+        
         # Prepara resposta
         response = AnalyzeResponse(
             symbol=normalized_symbol,
@@ -101,7 +150,9 @@ async def analyze_symbol(symbol: str):
             indicators=indicators_response,
             score=analysis['overall_score'],
             diagnostic=analysis['overall_diagnostic'],
-            ai_comment=ai_comment
+            ai_comment=ai_comment,
+            chart_data=chart_data,
+            trade_opportunity=trade_opportunity
         )
         
         return response

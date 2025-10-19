@@ -8,6 +8,61 @@ class ScoreEngine:
     """Engine para calcular scores e diagnósticos"""
     
     @staticmethod
+    def _flatten_indicators(indicators: Dict[str, Any]) -> Dict[str, Any]:
+        """
+        Converte a nova estrutura de indicadores (categorizada) para o formato flat
+        usado pelos métodos de cálculo de score (compatibilidade retroativa)
+        
+        Args:
+            indicators: Indicadores no novo formato (com categorias) ou formato antigo (flat)
+            
+        Returns:
+            Indicadores no formato flat
+        """
+        # Se já está no formato flat (chave 'rsi' existe diretamente), retorna como está
+        if 'rsi' in indicators:
+            return indicators
+        
+        # Se está no formato novo (com categorias), converte para flat
+        flat = {}
+        
+        # Trend
+        trend = indicators.get('trend', {})
+        flat['ema9'] = trend.get('EMA9')
+        flat['ema21'] = trend.get('EMA21')
+        flat['ema50'] = trend.get('EMA50')
+        flat['ema200'] = trend.get('EMA200')
+        flat['sma100'] = trend.get('SMA100')
+        
+        # Momentum
+        momentum = indicators.get('momentum', {})
+        flat['rsi'] = momentum.get('RSI')
+        flat['stoch_rsi_k'] = momentum.get('Stochastic_RSI_K')
+        flat['stoch_rsi_d'] = momentum.get('Stochastic_RSI_D')
+        flat['macd'] = momentum.get('MACD')
+        flat['macd_signal'] = momentum.get('MACD_Signal')
+        flat['macd_histogram'] = momentum.get('MACD_Histogram')
+        
+        # Volatility
+        volatility = indicators.get('volatility', {})
+        flat['atr'] = volatility.get('ATR')
+        flat['bb_upper'] = volatility.get('BB_Upper')
+        flat['bb_middle'] = volatility.get('BB_Middle')
+        flat['bb_lower'] = volatility.get('BB_Lower')
+        
+        # Volume
+        volume = indicators.get('volume', {})
+        flat['volume_ma'] = volume.get('Volume_MA')
+        flat['mfi'] = volume.get('MFI')
+        flat['obv'] = volume.get('OBV')
+        
+        # Strength
+        strength = indicators.get('strength', {})
+        flat['adx'] = strength.get('ADX')
+        
+        return flat
+    
+    @staticmethod
     def _calculate_rsi_score(rsi: float) -> float:
         """
         Calcula score baseado no RSI
@@ -141,7 +196,7 @@ class ScoreEngine:
         Calcula score geral baseado em todos os indicadores
         
         Args:
-            indicators: Dicionário com todos os indicadores
+            indicators: Dicionário com todos os indicadores (novo formato ou antigo)
             last_close: Último preço de fechamento
             current_volume: Volume atual
             
@@ -152,22 +207,25 @@ class ScoreEngine:
         if not indicators or last_close is None or last_close <= 0:
             return 0.5  # Retorna neutro se dados inválidos
         
+        # Converte para formato flat se necessário
+        flat_indicators = ScoreEngine._flatten_indicators(indicators)
+        
         # Calcula scores individuais
-        rsi_score = ScoreEngine._calculate_rsi_score(indicators.get('rsi'))
+        rsi_score = ScoreEngine._calculate_rsi_score(flat_indicators.get('rsi'))
         ema_score = ScoreEngine._calculate_ema_score(
             last_close,
-            indicators.get('ema9'),
-            indicators.get('ema21'),
-            indicators.get('ema200')
+            flat_indicators.get('ema9'),
+            flat_indicators.get('ema21'),
+            flat_indicators.get('ema200')
         )
         macd_score = ScoreEngine._calculate_macd_score(
-            indicators.get('macd'),
-            indicators.get('macd_signal'),
-            indicators.get('macd_histogram')
+            flat_indicators.get('macd'),
+            flat_indicators.get('macd_signal'),
+            flat_indicators.get('macd_histogram')
         )
         volume_score = ScoreEngine._calculate_volume_score(
             current_volume if current_volume else 0,
-            indicators.get('volume_ma')
+            flat_indicators.get('volume_ma')
         )
         
         # Pesos para cada indicador
@@ -199,12 +257,14 @@ class ScoreEngine:
         
         Args:
             score: Score calculado (0.0 a 1.0)
-            indicators: Dicionário com indicadores
+            indicators: Dicionário com indicadores (novo formato ou antigo)
             
         Returns:
             String com diagnóstico
         """
-        rsi = indicators.get('rsi', 50)
+        # Converte para formato flat se necessário
+        flat_indicators = ScoreEngine._flatten_indicators(indicators)
+        rsi = flat_indicators.get('rsi', 50)
         
         if score >= 0.75:
             return "Momento fortemente altista - Tendência de alta robusta"
@@ -264,5 +324,69 @@ class ScoreEngine:
             'diagnostics': diagnostics,
             'overall_score': round(overall_score, 2),
             'overall_diagnostic': overall_diagnostic
+        }
+    
+    @staticmethod
+    def analyze_short_term_opportunity(indicators_1h: Dict[str, Any], last_close: float, current_volume: float) -> Dict[str, Any]:
+        """
+        Analisa oportunidades de trade rápido (day trade / scalp) no timeframe de 1h
+        
+        Args:
+            indicators_1h: Indicadores do timeframe 1h
+            last_close: Último preço de fechamento
+            current_volume: Volume atual
+            
+        Returns:
+            Dicionário com probabilidade e comentário sobre a oportunidade
+        """
+        # Converte para formato flat se necessário
+        flat_indicators = ScoreEngine._flatten_indicators(indicators_1h)
+        
+        points = 0
+        max_points = 5
+        
+        # Critério 1: RSI entre 40 e 60, virando para cima → +1
+        rsi = flat_indicators.get('rsi')
+        if rsi is not None and 40 <= rsi <= 60:
+            # Considera "virando pra cima" se RSI está na metade superior da faixa
+            if rsi >= 50:
+                points += 1
+        
+        # Critério 2: EMA9 cruzando EMA21 pra cima → +1
+        ema9 = flat_indicators.get('ema9')
+        ema21 = flat_indicators.get('ema21')
+        if ema9 is not None and ema21 is not None:
+            if ema9 > ema21:
+                points += 1
+        
+        # Critério 3: Volume acima da média → +1
+        volume_ma = flat_indicators.get('volume_ma')
+        if volume_ma is not None and current_volume > volume_ma:
+            points += 1
+        
+        # Critério 4: MACD histograma positivo → +1
+        macd_histogram = flat_indicators.get('macd_histogram')
+        if macd_histogram is not None and macd_histogram > 0:
+            points += 1
+        
+        # Critério 5: ADX acima de 25 → +1
+        adx = flat_indicators.get('adx')
+        if adx is not None and adx > 25:
+            points += 1
+        
+        # Calcula probabilidade
+        probability = round(points / max_points, 2)
+        
+        # Gera comentário baseado na probabilidade
+        if probability >= 0.7:
+            comment = "Alta chance de movimento positivo nas próximas horas."
+        elif probability >= 0.4:
+            comment = "Possível oportunidade de curto prazo, aguarde confirmação."
+        else:
+            comment = "Sem sinal claro de trade rápido agora."
+        
+        return {
+            'probability': probability,
+            'comment': comment
         }
 
