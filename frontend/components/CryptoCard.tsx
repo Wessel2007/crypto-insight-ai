@@ -14,18 +14,19 @@ const CryptoCard: React.FC<CryptoCardProps> = ({ symbol, name, icon }) => {
   const [loading, setLoading] = useState(false);
   const [analysis, setAnalysis] = useState<AnalysisResponse | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [lastAnalysisTime, setLastAnalysisTime] = useState<Date | null>(null);
 
   const handleAnalyze = async () => {
     setLoading(true);
     setError(null);
     
     try {
+      // Força nova requisição à API, sem reusar cache
       const data = await analyzeCrypto(symbol);
+      // Substitui completamente os dados anteriores
       setAnalysis(data);
-      setLastAnalysisTime(new Date());
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Erro desconhecido');
+      // Limpa análise anterior em caso de erro
       setAnalysis(null);
     } finally {
       setLoading(false);
@@ -183,13 +184,28 @@ const CryptoCard: React.FC<CryptoCardProps> = ({ symbol, name, icon }) => {
       {/* Analysis Results */}
       {analysis && (
         <div className="space-y-3 sm:space-y-4 animate-fadeIn">
-          {/* Timestamp da última análise */}
-          {lastAnalysisTime && (
-            <div className="flex items-center justify-center space-x-1.5 sm:space-x-2 text-xs text-gray-400 mb-2">
-              <Activity className="w-3 h-3 flex-shrink-0" />
-              <span className="text-center">
-                Última análise: {lastAnalysisTime.toLocaleDateString('pt-BR')} às {lastAnalysisTime.toLocaleTimeString('pt-BR')}
-              </span>
+          {/* Timestamp da última análise - usando dados reais do backend */}
+          {analysis.last_candle_timestamp && analysis.last_candle_timestamp !== 'N/A' && (
+            <div className="bg-blue-900/20 border border-blue-500/30 rounded-lg p-2.5 sm:p-3 mb-2">
+              <div className="flex items-center justify-center space-x-1.5 sm:space-x-2">
+                <Activity className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-blue-400 flex-shrink-0 animate-pulse" />
+                <div className="text-center flex-1">
+                  <p className="text-xs text-gray-400 mb-0.5">Dados do mercado atualizados:</p>
+                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-center gap-1 sm:gap-3">
+                    <p className="text-sm sm:text-base font-semibold text-blue-300">
+                      {analysis.last_candle_timestamp}
+                    </p>
+                    {analysis.last_candle_timestamp_brt && analysis.last_candle_timestamp_brt !== 'N/A' && (
+                      <>
+                        <span className="hidden sm:inline text-gray-500">|</span>
+                        <p className="text-xs sm:text-sm font-medium text-green-300">
+                          {analysis.last_candle_timestamp_brt}
+                        </p>
+                      </>
+                    )}
+                  </div>
+                </div>
+              </div>
             </div>
           )}
 

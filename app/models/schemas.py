@@ -116,6 +116,8 @@ class AnalyzeResponse(BaseModel):
     indicators: Dict[str, IndicatorData]
     score: float
     diagnostic: str
+    last_candle_timestamp: str  # Data/hora do último candle usado (ex: "2025-10-20 15:00 UTC")
+    last_candle_timestamp_brt: str  # Data/hora do último candle em horário de Brasília (ex: "2025-10-20 12:00 BRT")
     ai_comment: Optional[str] = None
     chart_data: Optional[ChartDataResponse] = None
     trade_opportunity: Optional[TradeOpportunity] = None

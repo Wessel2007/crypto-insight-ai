@@ -3,8 +3,9 @@ Serviço para buscar dados de criptomoedas usando CCXT
 """
 import ccxt
 import pandas as pd
-from typing import List, Dict
-from datetime import datetime
+from typing import List, Dict, Tuple
+from datetime import datetime, timezone
+import pytz
 import time
 
 
@@ -35,14 +36,15 @@ class CryptoService:
     def get_candles(self, symbol: str, timeframe: str = '1h', limit: int = 500) -> pd.DataFrame:
         """
         Busca candles de uma criptomoeda com retry automático
+        SEMPRE busca dados em tempo real diretamente da API sem cache
         
         Args:
             symbol: Par de trading (ex: 'BTC/USDT')
             timeframe: Timeframe dos candles ('1h', '4h', '1d')
-            limit: Número de candles para buscar
+            limit: Número de candles para buscar (mínimo 500 recomendado)
             
         Returns:
-            DataFrame com os dados dos candles
+            DataFrame com os dados dos candles (timestamp, open, high, low, close, volume)
             
         Raises:
             Exception: Se houver erro após todas as tentativas
@@ -58,14 +60,29 @@ class CryptoService:
         if timeframe not in valid_timeframes:
             raise ValueError(f"Timeframe inválido. Use um dos: {', '.join(valid_timeframes)}")
         
+        # Calcula o timestamp 'since' para garantir dados mais recentes
+        # Usa exchange.milliseconds() para garantir sincronização com a exchange
+        timeframe_minutes = {
+            '1m': 1, '5m': 5, '15m': 15, '30m': 30,
+            '1h': 60, '4h': 240, '1d': 1440, '1w': 10080
+        }
+        minutes = timeframe_minutes.get(timeframe, 60)
+        
+        # Usa o horário da exchange (mais preciso que time.time())
+        now = self.exchange.milliseconds()
+        # Calcula 'since' baseado no número de candles e timeframe
+        # Fórmula: agora - (limit * intervalo_em_minutos * 60_segundos * 1000_milissegundos)
+        since = now - (limit * minutes * 60 * 1000)
+        
         last_exception = None
         
         for attempt in range(self.max_retries):
             try:
-                # Busca os dados da exchange
+                # Busca os dados da exchange COM parâmetro 'since' para garantir dados atualizados
                 ohlcv = self.exchange.fetch_ohlcv(
                     symbol=symbol,
                     timeframe=timeframe,
+                    since=since,
                     limit=limit
                 )
                 
@@ -83,8 +100,20 @@ class CryptoService:
                 if df.empty:
                     raise Exception(f"DataFrame vazio para {symbol}")
                 
-                # Converte timestamp para datetime
-                df['timestamp'] = pd.to_datetime(df['timestamp'], unit='ms')
+                # Guarda o timestamp do último candle ANTES de converter
+                last_candle_timestamp_ms = df['timestamp'].iloc[-1]
+                
+                # Converte timestamp para datetime ANTES de retornar
+                df['timestamp'] = pd.to_datetime(df['timestamp'], unit='ms', utc=True)
+                
+                # Valida se o último candle é recente (dentro de 24h para timeframes maiores)
+                max_delay_hours = {'1m': 1, '5m': 1, '15m': 2, '30m': 2, '1h': 3, '4h': 12, '1d': 48, '1w': 168}
+                max_delay = max_delay_hours.get(timeframe, 24) * 60 * 60 * 1000  # em milissegundos
+                
+                if (now - last_candle_timestamp_ms) > max_delay:
+                    print(f"⚠️ AVISO: Último candle de {symbol} ({timeframe}) está defasado!")
+                    print(f"   Horário atual: {datetime.fromtimestamp(now/1000, tz=timezone.utc)}")
+                    print(f"   Último candle: {datetime.fromtimestamp(last_candle_timestamp_ms/1000, tz=timezone.utc)}")
                 
                 return df
                 
@@ -129,6 +158,35 @@ class CryptoService:
             result[tf] = self.get_candles(symbol, tf, limit)
         
         return result
+    
+    def get_last_candle_timestamps(self, df: pd.DataFrame) -> Tuple[str, str]:
+        """
+        Extrai e formata os timestamps do último candle (UTC e Brasília)
+        
+        Args:
+            df: DataFrame com os candles (coluna 'timestamp' já convertida para datetime)
+            
+        Returns:
+            Tupla (timestamp_utc, timestamp_brt) formatados
+            Exemplo: ("2025-10-20 15:00 UTC", "2025-10-20 12:00 BRT")
+        """
+        if df.empty:
+            return ("N/A", "N/A")
+        
+        # Obtém o último timestamp (já está em UTC timezone-aware)
+        last_timestamp_utc = df['timestamp'].iloc[-1]
+        
+        # Formata UTC
+        timestamp_utc = last_timestamp_utc.strftime('%Y-%m-%d %H:%M UTC')
+        
+        # Converte para horário de Brasília (BRT/BRST)
+        brasilia_tz = pytz.timezone('America/Sao_Paulo')
+        last_timestamp_brt = last_timestamp_utc.astimezone(brasilia_tz)
+        
+        # Usa %Z para obter a abreviação correta (BRT ou BRST dependendo do horário de verão)
+        timestamp_brt = last_timestamp_brt.strftime('%Y-%m-%d %H:%M %Z')
+        
+        return (timestamp_utc, timestamp_brt)
     
     def normalize_symbol(self, symbol: str) -> str:
         """

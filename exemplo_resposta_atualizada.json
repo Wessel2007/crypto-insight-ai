@@ -1,0 +1,82 @@
+{
+  "symbol": "BTC/USDT",
+  "timeframes": [
+    "1h",
+    "4h",
+    "1d"
+  ],
+  "indicators": {
+    "1h": {
+      "trend": {
+        "EMA9": 107894.32,
+        "EMA21": 107234.56,
+        "EMA50": 106789.12,
+        "EMA200": 98456.78,
+        "SMA100": 102345.67
+      },
+      "momentum": {
+        "RSI": 54.32,
+        "Stochastic_RSI_K": 45.67,
+        "Stochastic_RSI_D": 43.21,
+        "MACD": 234.56,
+        "MACD_Signal": 198.45,
+        "MACD_Histogram": 36.11
+      },
+      "volatility": {
+        "ATR": 1234.56,
+        "BB_Upper": 109876.54,
+        "BB_Middle": 107234.56,
+        "BB_Lower": 104592.58
+      },
+      "volume": {
+        "Volume_MA": 450.23,
+        "MFI": 62.34,
+        "OBV": 1234567890
+      },
+      "strength": {
+        "ADX": 28.45
+      },
+      "price": {
+        "last_close": 107994.21,
+        "current_volume": 400.98
+      }
+    },
+    "4h": {
+      "...": "..."
+    },
+    "1d": {
+      "...": "..."
+    }
+  },
+  "score": 0.68,
+  "diagnostic": "Tendência altista moderada com momentum positivo. BTC está acima das EMAs principais (9, 21, 50, 200), indicando força altista. RSI em 54.32 mostra momentum saudável sem sobrecompra. MACD positivo confirma tendência de alta. Volume está ligeiramente acima da média.",
+  
+  "last_candle_timestamp": "2025-10-20 01:00 UTC",
+  "last_candle_timestamp_brt": "2025-10-19 22:00 -03",
+  
+  "ai_comment": "Bitcoin está mostrando sinais de recuperação após a correção recente. A estrutura técnica permanece altista com preço acima das médias móveis principais. O momentum está saudável e há espaço para continuação do movimento de alta. Observe a resistência em $109,000.",
+  
+  "chart_data": {
+    "symbol": "BTC/USDT",
+    "timeframe": "4h",
+    "candles": [
+      {
+        "time": 1729382400,
+        "open": 107500.00,
+        "high": 108276.04,
+        "low": 107402.52,
+        "close": 107994.21,
+        "volume": 1599.84,
+        "ema9": 107894.32,
+        "ema21": 107234.56,
+        "ema200": 98456.78
+      }
+    ]
+  },
+  
+  "trade_opportunity": {
+    "probability": 0.72,
+    "comment": "Alta probabilidade de movimento positivo no curto prazo (1h). RSI favorável, volume crescente, MACD cruzado para cima, preço acima das EMAs e tendência de alta clara. Considere entry com stop loss ajustado."
+  }
+}
+

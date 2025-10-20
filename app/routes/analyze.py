@@ -35,19 +35,28 @@ async def analyze_symbol(symbol: str):
         # Valida e normaliza o símbolo
         normalized_symbol = validate_and_normalize_symbol(symbol, crypto_service)
         
-        # Busca dados dos timeframes
+        # Busca dados dos timeframes (SEMPRE em tempo real, sem cache)
+        # Usa 500+ candles para garantir cálculo preciso dos indicadores
         timeframes = ['1h', '4h', '1d']
         try:
             data = crypto_service.get_multiple_timeframes(normalized_symbol, timeframes, limit=500)
         except Exception as e:
             handle_crypto_service_error(e, symbol, "buscar dados")
         
-        # Calcula indicadores para cada timeframe
+        # Captura timestamps do último candle (usa o timeframe de 1h como referência)
+        last_candle_timestamp = "N/A"
+        last_candle_timestamp_brt = "N/A"
+        if '1h' in data and not data['1h'].empty:
+            # Obtém timestamps formatados (UTC e Brasília)
+            last_candle_timestamp, last_candle_timestamp_brt = crypto_service.get_last_candle_timestamps(data['1h'])
+        
+        # Calcula indicadores para cada timeframe (RECALCULADOS a cada requisição)
         timeframes_data = {}
         indicators_response = {}
         
         for tf, df in data.items():
             # Calcula todos os indicadores usando a nova função get_indicators
+            # TODOS os indicadores são recalculados com os dados mais recentes
             indicators = indicator_service.get_indicators(df)
             
             # Prepara dados para o score engine
@@ -129,13 +138,15 @@ async def analyze_symbol(symbol: str):
             # Se houver erro ao preparar dados do gráfico, apenas loga mas não falha a análise
             print(f"⚠️ Erro ao preparar dados do gráfico: {str(e)}")
         
-        # Prepara resposta
+        # Prepara resposta com timestamps do último candle (UTC e Brasília)
         response = AnalyzeResponse(
             symbol=normalized_symbol,
             timeframes=timeframes,
             indicators=indicators_response,
             score=analysis['overall_score'],
             diagnostic=analysis['overall_diagnostic'],
+            last_candle_timestamp=last_candle_timestamp,
+            last_candle_timestamp_brt=last_candle_timestamp_brt,
             ai_comment=ai_comment,
             chart_data=chart_data,
             trade_opportunity=trade_opportunity
