@@ -81,22 +81,22 @@ const CryptoCard: React.FC<CryptoCardProps> = ({ symbol, name, icon }) => {
     const description = indicator?.description || "";
 
     return (
-      <div className={`rounded-lg p-4 transition-all duration-200 hover:scale-[1.02] ${
+      <div className={`rounded-lg p-3 sm:p-4 transition-all duration-200 overflow-hidden ${
         isImportant 
           ? 'bg-gradient-to-br from-blue-900/40 to-purple-900/40 border-2 border-blue-500/50 shadow-lg shadow-blue-500/20' 
           : 'bg-gray-900/50 border border-gray-700/50'
       }`}>
         <div className="flex items-start justify-between mb-2">
-          <div className="flex-1">
-            <p className={`text-sm font-semibold mb-1 ${isImportant ? 'text-blue-300' : 'text-gray-300'}`}>
+          <div className="flex-1 min-w-0">
+            <p className={`text-xs sm:text-sm font-semibold mb-1 break-words ${isImportant ? 'text-blue-300' : 'text-gray-300'}`}>
               {label}
-              {isImportant && <span className="ml-2 text-xs bg-blue-500/30 text-blue-200 px-2 py-0.5 rounded-full">★ Importante</span>}
+              {isImportant && <span className="ml-1 sm:ml-2 text-xs bg-blue-500/30 text-blue-200 px-1.5 sm:px-2 py-0.5 rounded-full whitespace-nowrap">★ Importante</span>}
             </p>
-            <p className={`text-2xl font-bold ${isImportant ? 'text-white' : 'text-gray-100'}`}>
+            <p className={`text-xl sm:text-2xl font-bold truncate ${isImportant ? 'text-white' : 'text-gray-100'}`}>
               {formatIndicatorValue(value)}
             </p>
             {interpretation && (
-              <p className={`text-xs mt-1 font-medium ${
+              <p className={`text-xs mt-1 font-medium break-words ${
                 interpretation.includes('Sobrevendido') || interpretation.includes('compra') 
                   ? 'text-green-400' 
                   : interpretation.includes('Sobrecomprado') || interpretation.includes('venda')
@@ -109,8 +109,8 @@ const CryptoCard: React.FC<CryptoCardProps> = ({ symbol, name, icon }) => {
           </div>
         </div>
         {description && (
-          <div className="mt-3 pt-3 border-t border-gray-700/50">
-            <p className="text-xs text-gray-400 leading-relaxed">{description}</p>
+          <div className="mt-2 sm:mt-3 pt-2 sm:pt-3 border-t border-gray-700/50">
+            <p className="text-xs text-gray-400 leading-relaxed break-words">{description}</p>
           </div>
         )}
       </div>
@@ -118,14 +118,14 @@ const CryptoCard: React.FC<CryptoCardProps> = ({ symbol, name, icon }) => {
   };
 
   return (
-    <div className="bg-gradient-to-br from-gray-900 to-gray-800 rounded-2xl p-4 sm:p-6 shadow-2xl border border-gray-700 hover:border-gray-600 transition-all duration-300 hover:shadow-3xl hover:scale-[1.01]">
+    <div className="bg-gradient-to-br from-gray-900 to-gray-800 rounded-xl sm:rounded-2xl p-3 sm:p-4 md:p-5 lg:p-6 shadow-2xl border border-gray-700 transition-all duration-300 w-full overflow-hidden">
       {/* Header */}
-      <div className="flex items-center justify-between mb-6">
-        <div className="flex items-center space-x-3">
-          <div className="text-4xl sm:text-5xl">{icon}</div>
-          <div>
-            <h2 className="text-xl sm:text-2xl font-bold text-white">{symbol}</h2>
-            <p className="text-gray-400 text-xs sm:text-sm">{name}</p>
+      <div className="flex items-center justify-between mb-4 sm:mb-6">
+        <div className="flex items-center space-x-2 sm:space-x-3">
+          <div className="text-3xl sm:text-4xl md:text-5xl flex-shrink-0">{icon}</div>
+          <div className="overflow-hidden min-w-0">
+            <h2 className="text-lg sm:text-xl md:text-2xl font-bold text-white truncate">{symbol}</h2>
+            <p className="text-gray-400 text-xs sm:text-sm truncate">{name}</p>
           </div>
         </div>
       </div>
@@ -134,16 +134,16 @@ const CryptoCard: React.FC<CryptoCardProps> = ({ symbol, name, icon }) => {
       <button
         onClick={handleAnalyze}
         disabled={loading}
-        className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-semibold py-4 px-6 rounded-xl transition-all duration-200 disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center space-x-2 mb-4 shadow-lg hover:shadow-xl"
+        className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white text-sm sm:text-base font-semibold py-3 sm:py-4 px-4 sm:px-6 rounded-lg sm:rounded-xl transition-all duration-200 disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center space-x-2 mb-3 sm:mb-4 shadow-lg hover:shadow-xl active:scale-95"
       >
         {loading ? (
           <>
-            <Loader2 className="w-5 h-5 animate-spin" />
+            <Loader2 className="w-4 h-4 sm:w-5 sm:h-5 animate-spin" />
             <span>Analisando...</span>
           </>
         ) : (
           <>
-            <BarChart3 className="w-5 h-5" />
+            <BarChart3 className="w-4 h-4 sm:w-5 sm:h-5" />
             <span>Analisar agora</span>
           </>
         )}
@@ -151,18 +151,18 @@ const CryptoCard: React.FC<CryptoCardProps> = ({ symbol, name, icon }) => {
 
       {/* Loading Indicator */}
       {loading && (
-        <div className="mb-4 bg-gradient-to-r from-blue-900/30 to-purple-900/30 border border-blue-500/30 rounded-xl p-6">
-          <div className="flex flex-col items-center space-y-4">
+        <div className="mb-3 sm:mb-4 bg-gradient-to-r from-blue-900/30 to-purple-900/30 border border-blue-500/30 rounded-lg sm:rounded-xl p-4 sm:p-6">
+          <div className="flex flex-col items-center space-y-3 sm:space-y-4">
             <div className="relative">
-              <div className="w-16 h-16 border-4 border-blue-500/30 rounded-full"></div>
-              <div className="absolute top-0 left-0 w-16 h-16 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+              <div className="w-12 h-12 sm:w-16 sm:h-16 border-4 border-blue-500/30 rounded-full"></div>
+              <div className="absolute top-0 left-0 w-12 h-12 sm:w-16 sm:h-16 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
             </div>
             <div className="text-center">
-              <p className="text-blue-300 font-semibold mb-1">Processando análise técnica</p>
-              <p className="text-blue-400/70 text-sm">Calculando indicadores e scores...</p>
+              <p className="text-blue-300 text-sm sm:text-base font-semibold mb-1">Processando análise técnica</p>
+              <p className="text-blue-400/70 text-xs sm:text-sm">Calculando indicadores e scores...</p>
             </div>
             {/* Progress bar animation */}
-            <div className="w-full bg-gray-800 rounded-full h-2 overflow-hidden">
+            <div className="w-full bg-gray-800 rounded-full h-1.5 sm:h-2 overflow-hidden">
               <div className="h-full bg-gradient-to-r from-blue-500 to-purple-500 rounded-full animate-pulse" style={{ width: '70%' }}></div>
             </div>
           </div>
@@ -171,32 +171,32 @@ const CryptoCard: React.FC<CryptoCardProps> = ({ symbol, name, icon }) => {
 
       {/* Error Message */}
       {error && (
-        <div className="bg-red-900/30 border border-red-500/50 rounded-lg p-4 mb-4 flex items-start space-x-3">
-          <AlertCircle className="w-5 h-5 text-red-400 flex-shrink-0 mt-0.5" />
-          <div>
-            <p className="text-red-300 text-sm font-medium">Erro ao analisar</p>
-            <p className="text-red-400 text-xs mt-1">{error}</p>
+        <div className="bg-red-900/30 border border-red-500/50 rounded-lg p-3 sm:p-4 mb-3 sm:mb-4 flex items-start space-x-2 sm:space-x-3">
+          <AlertCircle className="w-4 h-4 sm:w-5 sm:h-5 text-red-400 flex-shrink-0 mt-0.5" />
+          <div className="min-w-0">
+            <p className="text-red-300 text-xs sm:text-sm font-medium">Erro ao analisar</p>
+            <p className="text-red-400 text-xs mt-1 break-words">{error}</p>
           </div>
         </div>
       )}
 
       {/* Analysis Results */}
       {analysis && (
-        <div className="space-y-4 animate-fadeIn">
+        <div className="space-y-3 sm:space-y-4 animate-fadeIn">
           {/* Timestamp da última análise */}
           {lastAnalysisTime && (
-            <div className="flex items-center justify-center space-x-2 text-xs text-gray-400 mb-2">
-              <Activity className="w-3 h-3" />
-              <span>
+            <div className="flex items-center justify-center space-x-1.5 sm:space-x-2 text-xs text-gray-400 mb-2">
+              <Activity className="w-3 h-3 flex-shrink-0" />
+              <span className="text-center">
                 Última análise: {lastAnalysisTime.toLocaleDateString('pt-BR')} às {lastAnalysisTime.toLocaleTimeString('pt-BR')}
               </span>
             </div>
           )}
 
           {/* Score Section - Com cores dinâmicas */}
-          <div className={`rounded-xl p-6 border-2 shadow-xl transition-all duration-500 bg-gradient-to-br ${scoreColors.gradient} ${scoreColors.border}`}>
-            <div className="flex items-center justify-between mb-4">
-              <h3 className={`text-lg font-semibold ${
+          <div className={`rounded-lg sm:rounded-xl p-4 sm:p-5 md:p-6 border-2 shadow-xl transition-all duration-500 bg-gradient-to-br ${scoreColors.gradient} ${scoreColors.border}`}>
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-3 sm:mb-4 gap-3">
+              <h3 className={`text-base sm:text-lg font-semibold ${
                 scorePercentage >= 65 
                   ? 'text-green-200'
                   : scorePercentage >= 45
@@ -205,11 +205,11 @@ const CryptoCard: React.FC<CryptoCardProps> = ({ symbol, name, icon }) => {
               }`}>
                 Score de Análise
               </h3>
-              <div className="text-center">
-                <span className={`text-4xl font-bold ${scoreColors.text}`}>
+              <div className="text-center sm:text-right">
+                <span className={`text-3xl sm:text-4xl font-bold ${scoreColors.text}`}>
                   {scorePercentage}
                 </span>
-                <p className="text-xs text-gray-400 mt-1">
+                <p className="text-xs text-gray-400 mt-1 whitespace-nowrap">
                   {scorePercentage >= 65 
                     ? '🟢 Momento favorável'
                     : scorePercentage >= 45
@@ -220,7 +220,7 @@ const CryptoCard: React.FC<CryptoCardProps> = ({ symbol, name, icon }) => {
             </div>
             
             {/* Progress Bar - Destaque visual */}
-            <div className="w-full bg-gray-900/60 rounded-full h-4 overflow-hidden shadow-inner">
+            <div className="w-full bg-gray-900/60 rounded-full h-3 sm:h-4 overflow-hidden shadow-inner">
               <div
                 className={`h-full ${scoreColors.bg} transition-all duration-700 ease-out rounded-full shadow-lg relative`}
                 style={{ width: `${scorePercentage}%` }}
@@ -229,39 +229,42 @@ const CryptoCard: React.FC<CryptoCardProps> = ({ symbol, name, icon }) => {
               </div>
             </div>
             
-            <div className="flex items-center justify-between mt-3 text-xs text-gray-400">
-              <span className="flex items-center space-x-1">
-                <span className="inline-block w-2 h-2 bg-red-500 rounded-full"></span>
-                <span>0 Baixista</span>
+            <div className="flex items-center justify-between mt-2 sm:mt-3 text-xs text-gray-400 gap-2">
+              <span className="flex items-center space-x-1 whitespace-nowrap">
+                <span className="inline-block w-1.5 h-1.5 sm:w-2 sm:h-2 bg-red-500 rounded-full flex-shrink-0"></span>
+                <span className="hidden sm:inline">0 Baixista</span>
+                <span className="sm:hidden">0</span>
               </span>
-              <span className="flex items-center space-x-1">
-                <span className="inline-block w-2 h-2 bg-yellow-500 rounded-full"></span>
-                <span>50 Neutro</span>
+              <span className="flex items-center space-x-1 whitespace-nowrap">
+                <span className="inline-block w-1.5 h-1.5 sm:w-2 sm:h-2 bg-yellow-500 rounded-full flex-shrink-0"></span>
+                <span className="hidden sm:inline">50 Neutro</span>
+                <span className="sm:hidden">50</span>
               </span>
-              <span className="flex items-center space-x-1">
-                <span className="inline-block w-2 h-2 bg-green-500 rounded-full"></span>
-                <span>100 Altista</span>
+              <span className="flex items-center space-x-1 whitespace-nowrap">
+                <span className="inline-block w-1.5 h-1.5 sm:w-2 sm:h-2 bg-green-500 rounded-full flex-shrink-0"></span>
+                <span className="hidden sm:inline">100 Altista</span>
+                <span className="sm:hidden">100</span>
               </span>
             </div>
           </div>
 
           {/* AI Comment - Priority if available */}
           {analysis.ai_comment && (
-            <div className="bg-gradient-to-br from-purple-900/40 to-blue-900/40 border-2 border-purple-500/40 rounded-xl p-4 sm:p-5 shadow-lg">
-              <div className="flex items-center space-x-2 mb-3">
-                <div className="relative">
+            <div className="bg-gradient-to-br from-purple-900/40 to-blue-900/40 border-2 border-purple-500/40 rounded-lg sm:rounded-xl p-3 sm:p-4 md:p-5 shadow-lg overflow-hidden">
+              <div className="flex items-center space-x-2 mb-2 sm:mb-3">
+                <div className="relative flex-shrink-0">
                   <div className="absolute inset-0 bg-purple-500 rounded-full blur-md opacity-60 animate-pulse-glow"></div>
-                  <div className="relative text-xl sm:text-2xl">🤖</div>
+                  <div className="relative text-lg sm:text-xl md:text-2xl">🤖</div>
                 </div>
-                <h3 className="text-base sm:text-lg font-semibold text-purple-200">Análise da IA</h3>
+                <h3 className="text-sm sm:text-base md:text-lg font-semibold text-purple-200 truncate">Análise da IA</h3>
               </div>
-              <p className="text-purple-100 text-xs sm:text-sm leading-relaxed italic">"{analysis.ai_comment}"</p>
+              <p className="text-purple-100 text-xs sm:text-sm leading-relaxed italic break-words">"{analysis.ai_comment}"</p>
             </div>
           )}
 
           {/* Trade Opportunity - Quick Trade Analysis - DESTAQUE */}
           {analysis.trade_opportunity && (
-            <div className={`rounded-xl p-6 border-2 shadow-2xl transition-all duration-500 ${
+            <div className={`rounded-xl p-4 sm:p-6 border-2 shadow-2xl transition-all duration-500 overflow-hidden ${
               analysis.trade_opportunity.probability >= 0.7 
                 ? 'bg-gradient-to-br from-green-900/40 to-emerald-900/40 border-green-500/60 shadow-green-500/20'
                 : analysis.trade_opportunity.probability >= 0.4
@@ -269,8 +272,8 @@ const CryptoCard: React.FC<CryptoCardProps> = ({ symbol, name, icon }) => {
                 : 'bg-gradient-to-br from-gray-900/40 to-slate-900/40 border-gray-500/60 shadow-gray-500/20'
             }`}>
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4 gap-3">
-                <div className="flex items-center space-x-3">
-                  <div className="relative">
+                <div className="flex items-center space-x-3 min-w-0">
+                  <div className="relative flex-shrink-0">
                     <div className={`absolute inset-0 rounded-full blur-md opacity-60 ${
                       analysis.trade_opportunity.probability >= 0.7 
                         ? 'bg-green-500'
@@ -283,8 +286,8 @@ const CryptoCard: React.FC<CryptoCardProps> = ({ symbol, name, icon }) => {
                        analysis.trade_opportunity.probability >= 0.4 ? '⏱️' : '⏸️'}
                     </div>
                   </div>
-                  <div>
-                    <h3 className={`text-lg font-bold ${
+                  <div className="min-w-0">
+                    <h3 className={`text-lg font-bold truncate ${
                       analysis.trade_opportunity.probability >= 0.7 
                         ? 'text-green-200'
                         : analysis.trade_opportunity.probability >= 0.4
@@ -293,11 +296,11 @@ const CryptoCard: React.FC<CryptoCardProps> = ({ symbol, name, icon }) => {
                     }`}>
                       Trade Rápido (1h)
                     </h3>
-                    <p className="text-xs text-gray-400">Probabilidade de sucesso</p>
+                    <p className="text-xs text-gray-400 truncate">Probabilidade de sucesso</p>
                   </div>
                 </div>
-                <div className="text-center sm:text-right">
-                  <div className={`text-5xl font-bold ${
+                <div className="text-center sm:text-right flex-shrink-0">
+                  <div className={`text-4xl sm:text-5xl font-bold ${
                     analysis.trade_opportunity.probability >= 0.7 
                       ? 'text-green-400'
                       : analysis.trade_opportunity.probability >= 0.4
@@ -310,13 +313,13 @@ const CryptoCard: React.FC<CryptoCardProps> = ({ symbol, name, icon }) => {
               </div>
               
               {/* Progress Bar - DESTAQUE MÁXIMO */}
-              <div className="mb-4">
-                <div className="flex items-center justify-between mb-2 text-xs text-gray-400">
+              <div className="mb-3 sm:mb-4">
+                <div className="flex items-center justify-between mb-1.5 sm:mb-2 text-xs text-gray-400">
                   <span>0%</span>
-                  <span className="font-semibold">Probabilidade</span>
+                  <span className="font-semibold text-xs sm:text-sm">Probabilidade</span>
                   <span>100%</span>
                 </div>
-                <div className="w-full bg-gray-900/60 rounded-full h-6 overflow-hidden shadow-inner">
+                <div className="w-full bg-gray-900/60 rounded-full h-5 sm:h-6 overflow-hidden shadow-inner">
                   <div
                     className={`h-full transition-all duration-700 ease-out rounded-full shadow-lg relative ${
                       analysis.trade_opportunity.probability >= 0.7 
@@ -328,14 +331,14 @@ const CryptoCard: React.FC<CryptoCardProps> = ({ symbol, name, icon }) => {
                     style={{ width: `${analysis.trade_opportunity.probability * 100}%` }}
                   >
                     <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent animate-shimmer"></div>
-                    <div className="absolute right-2 top-1/2 -translate-y-1/2 text-xs font-bold text-white">
+                    <div className="absolute right-1.5 sm:right-2 top-1/2 -translate-y-1/2 text-xs font-bold text-white">
                       {Math.round(analysis.trade_opportunity.probability * 100)}%
                     </div>
                   </div>
                 </div>
               </div>
               
-              <p className={`text-sm leading-relaxed mb-3 ${
+              <p className={`text-sm leading-relaxed mb-3 break-words ${
                 analysis.trade_opportunity.probability >= 0.7 
                   ? 'text-green-100'
                   : analysis.trade_opportunity.probability >= 0.4
@@ -354,8 +357,8 @@ const CryptoCard: React.FC<CryptoCardProps> = ({ symbol, name, icon }) => {
                   : 'border-gray-500/30'
               }`}>
                 <div className="flex flex-col sm:flex-row items-center justify-between text-xs gap-2">
-                  <span className="text-gray-400">Baseado em 5 critérios técnicos</span>
-                  <span className={`font-semibold px-3 py-1.5 rounded-lg shadow-md ${
+                  <span className="text-gray-400 text-center sm:text-left">Baseado em 5 critérios técnicos</span>
+                  <span className={`font-semibold px-3 py-1.5 rounded-lg shadow-md text-center whitespace-nowrap ${
                     analysis.trade_opportunity.probability >= 0.7 
                       ? 'bg-green-500/30 text-green-200 border border-green-500/50'
                       : analysis.trade_opportunity.probability >= 0.4
@@ -363,10 +366,10 @@ const CryptoCard: React.FC<CryptoCardProps> = ({ symbol, name, icon }) => {
                       : 'bg-gray-500/30 text-gray-200 border border-gray-500/50'
                   }`}>
                     {analysis.trade_opportunity.probability >= 0.7 
-                      ? '🟢 Sinal Forte - Considere entrar'
+                      ? '🟢 Sinal Forte'
                       : analysis.trade_opportunity.probability >= 0.4
-                      ? '🟡 Aguardar Confirmação'
-                      : '🔴 Sem Sinal Claro'}
+                      ? '🟡 Aguardar'
+                      : '🔴 Sem Sinal'}
                   </span>
                 </div>
               </div>
@@ -383,27 +386,27 @@ const CryptoCard: React.FC<CryptoCardProps> = ({ symbol, name, icon }) => {
           )}
 
           {/* Diagnostic */}
-          <div className="bg-gray-800/50 rounded-xl p-4 sm:p-5 border border-gray-700">
-            <h3 className="text-base sm:text-lg font-semibold text-gray-200 mb-2">Diagnóstico Técnico</h3>
-            <p className="text-gray-300 text-xs sm:text-sm leading-relaxed">{analysis.diagnostic}</p>
+          <div className="bg-gray-800/50 rounded-lg sm:rounded-xl p-3 sm:p-4 md:p-5 border border-gray-700 overflow-hidden">
+            <h3 className="text-sm sm:text-base md:text-lg font-semibold text-gray-200 mb-2">Diagnóstico Técnico</h3>
+            <p className="text-gray-300 text-xs sm:text-sm leading-relaxed break-words">{analysis.diagnostic}</p>
           </div>
 
           {/* Indicadores Técnicos - Timeframe Diário */}
           {analysis.indicators && analysis.indicators['1d'] && (
-            <div className="space-y-6">
-              <div className="border-l-4 border-blue-500 pl-4">
-                <h2 className="text-xl font-bold text-gray-100 mb-1">📊 Indicadores Técnicos</h2>
-                <p className="text-sm text-gray-400">Análise detalhada com descrições educacionais</p>
+            <div className="space-y-4 sm:space-y-5 md:space-y-6">
+              <div className="border-l-4 border-blue-500 pl-3 sm:pl-4">
+                <h2 className="text-lg sm:text-xl font-bold text-gray-100 mb-1">📊 Indicadores Técnicos</h2>
+                <p className="text-xs sm:text-sm text-gray-400">Análise detalhada com descrições educacionais</p>
               </div>
 
               {/* Tendência */}
-              <div className="bg-gradient-to-br from-gray-800/80 to-gray-900/80 rounded-xl p-5 border border-blue-500/30">
-                <div className="flex items-center mb-5 pb-3 border-b border-blue-500/20">
-                  <TrendingUp className="w-5 h-5 mr-2 text-blue-400" />
-                  <h3 className="text-lg font-bold text-blue-300">Tendência</h3>
-                  <span className="ml-auto text-xs text-gray-400">Médias Móveis</span>
+              <div className="bg-gradient-to-br from-gray-800/80 to-gray-900/80 rounded-lg sm:rounded-xl p-3 sm:p-4 md:p-5 border border-blue-500/30">
+                <div className="flex items-center mb-3 sm:mb-4 md:mb-5 pb-2 sm:pb-3 border-b border-blue-500/20">
+                  <TrendingUp className="w-4 h-4 sm:w-5 sm:h-5 mr-2 text-blue-400 flex-shrink-0" />
+                  <h3 className="text-base sm:text-lg font-bold text-blue-300">Tendência</h3>
+                  <span className="ml-auto text-xs text-gray-400 whitespace-nowrap">Médias Móveis</span>
                 </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 sm:gap-3">
                   <IndicatorCard 
                     label="EMA 9" 
                     value={analysis.indicators['1d'].trend.EMA9} 
@@ -435,13 +438,13 @@ const CryptoCard: React.FC<CryptoCardProps> = ({ symbol, name, icon }) => {
               </div>
 
               {/* Momentum */}
-              <div className="bg-gradient-to-br from-gray-800/80 to-gray-900/80 rounded-xl p-5 border border-purple-500/30">
-                <div className="flex items-center mb-5 pb-3 border-b border-purple-500/20">
-                  <Zap className="w-5 h-5 mr-2 text-purple-400" />
-                  <h3 className="text-lg font-bold text-purple-300">Momentum</h3>
-                  <span className="ml-auto text-xs text-gray-400">Força do Movimento</span>
+              <div className="bg-gradient-to-br from-gray-800/80 to-gray-900/80 rounded-lg sm:rounded-xl p-3 sm:p-4 md:p-5 border border-purple-500/30">
+                <div className="flex items-center mb-3 sm:mb-4 md:mb-5 pb-2 sm:pb-3 border-b border-purple-500/20">
+                  <Zap className="w-4 h-4 sm:w-5 sm:h-5 mr-2 text-purple-400 flex-shrink-0" />
+                  <h3 className="text-base sm:text-lg font-bold text-purple-300">Momentum</h3>
+                  <span className="ml-auto text-xs text-gray-400 whitespace-nowrap hidden sm:inline">Força do Movimento</span>
                 </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 sm:gap-3">
                   <IndicatorCard 
                     label="RSI (14)" 
                     value={analysis.indicators['1d'].momentum.RSI} 
@@ -480,13 +483,13 @@ const CryptoCard: React.FC<CryptoCardProps> = ({ symbol, name, icon }) => {
               </div>
 
               {/* Volatilidade */}
-              <div className="bg-gradient-to-br from-gray-800/80 to-gray-900/80 rounded-xl p-5 border border-yellow-500/30">
-                <div className="flex items-center mb-5 pb-3 border-b border-yellow-500/20">
-                  <AlertCircle className="w-5 h-5 mr-2 text-yellow-400" />
-                  <h3 className="text-lg font-bold text-yellow-300">Volatilidade</h3>
-                  <span className="ml-auto text-xs text-gray-400">Risco e Variação</span>
+              <div className="bg-gradient-to-br from-gray-800/80 to-gray-900/80 rounded-lg sm:rounded-xl p-3 sm:p-4 md:p-5 border border-yellow-500/30">
+                <div className="flex items-center mb-3 sm:mb-4 md:mb-5 pb-2 sm:pb-3 border-b border-yellow-500/20">
+                  <AlertCircle className="w-4 h-4 sm:w-5 sm:h-5 mr-2 text-yellow-400 flex-shrink-0" />
+                  <h3 className="text-base sm:text-lg font-bold text-yellow-300">Volatilidade</h3>
+                  <span className="ml-auto text-xs text-gray-400 whitespace-nowrap hidden sm:inline">Risco e Variação</span>
                 </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-3">
                   <IndicatorCard 
                     label="ATR (14)" 
                     value={analysis.indicators['1d'].volatility.ATR} 
@@ -511,15 +514,15 @@ const CryptoCard: React.FC<CryptoCardProps> = ({ symbol, name, icon }) => {
               </div>
 
               {/* Volume e Força */}
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 sm:gap-4">
                 {/* Volume */}
-                <div className="bg-gradient-to-br from-gray-800/80 to-gray-900/80 rounded-xl p-5 border border-green-500/30">
-                  <div className="flex items-center mb-5 pb-3 border-b border-green-500/20">
-                    <BarChart3 className="w-5 h-5 mr-2 text-green-400" />
-                    <h3 className="text-lg font-bold text-green-300">Volume</h3>
+                <div className="bg-gradient-to-br from-gray-800/80 to-gray-900/80 rounded-lg sm:rounded-xl p-3 sm:p-4 md:p-5 border border-green-500/30">
+                  <div className="flex items-center mb-3 sm:mb-4 md:mb-5 pb-2 sm:pb-3 border-b border-green-500/20">
+                    <BarChart3 className="w-4 h-4 sm:w-5 sm:h-5 mr-2 text-green-400 flex-shrink-0" />
+                    <h3 className="text-base sm:text-lg font-bold text-green-300">Volume</h3>
                     <span className="ml-auto text-xs text-gray-400">Liquidez</span>
                   </div>
-                  <div className="space-y-4">
+                  <div className="space-y-3 sm:space-y-4">
                     <IndicatorCard 
                       label="Volume MA" 
                       value={analysis.indicators['1d'].volume.Volume_MA} 
@@ -540,13 +543,13 @@ const CryptoCard: React.FC<CryptoCardProps> = ({ symbol, name, icon }) => {
                 </div>
 
                 {/* Força da Tendência */}
-                <div className="bg-gradient-to-br from-gray-800/80 to-gray-900/80 rounded-xl p-5 border border-orange-500/30">
-                  <div className="flex items-center mb-5 pb-3 border-b border-orange-500/20">
-                    <Gauge className="w-5 h-5 mr-2 text-orange-400" />
-                    <h3 className="text-lg font-bold text-orange-300">Força</h3>
+                <div className="bg-gradient-to-br from-gray-800/80 to-gray-900/80 rounded-lg sm:rounded-xl p-3 sm:p-4 md:p-5 border border-orange-500/30">
+                  <div className="flex items-center mb-3 sm:mb-4 md:mb-5 pb-2 sm:pb-3 border-b border-orange-500/20">
+                    <Gauge className="w-4 h-4 sm:w-5 sm:h-5 mr-2 text-orange-400 flex-shrink-0" />
+                    <h3 className="text-base sm:text-lg font-bold text-orange-300">Força</h3>
                     <span className="ml-auto text-xs text-gray-400">Intensidade</span>
                   </div>
-                  <div className="space-y-4">
+                  <div className="space-y-3 sm:space-y-4">
                     <IndicatorCard 
                       label="ADX (14)" 
                       value={analysis.indicators['1d'].strength.ADX} 
@@ -571,13 +574,13 @@ const CryptoCard: React.FC<CryptoCardProps> = ({ symbol, name, icon }) => {
 
           {/* Timeframes */}
           {analysis.timeframes && analysis.timeframes.length > 0 && (
-            <div className="bg-gray-800/50 rounded-xl p-5 border border-gray-700">
-              <h3 className="text-lg font-semibold text-gray-200 mb-3">Timeframes Analisados</h3>
-              <div className="flex space-x-2">
+            <div className="bg-gray-800/50 rounded-lg sm:rounded-xl p-3 sm:p-4 md:p-5 border border-gray-700 overflow-hidden">
+              <h3 className="text-sm sm:text-base md:text-lg font-semibold text-gray-200 mb-2 sm:mb-3">Timeframes Analisados</h3>
+              <div className="flex flex-wrap gap-1.5 sm:gap-2">
                 {analysis.timeframes.map((tf) => (
                   <span 
                     key={tf} 
-                    className="bg-blue-500/20 border border-blue-500/30 text-blue-300 px-3 py-1 rounded-full text-xs font-medium"
+                    className="bg-blue-500/20 border border-blue-500/30 text-blue-300 px-2 sm:px-3 py-1 rounded-full text-xs font-medium whitespace-nowrap"
                   >
                     {tf}
                   </span>

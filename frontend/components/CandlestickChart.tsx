@@ -186,19 +186,19 @@ const CandlestickChart: React.FC<CandlestickChartProps> = ({ data, symbol, isLoa
   }
 
   return (
-    <div className="bg-gray-800/50 rounded-xl p-5 border border-gray-700 relative">
-      <div className="flex items-center justify-between mb-4">
-        <h3 className="text-lg font-semibold text-gray-200">Gráfico de Candlestick - {symbol}</h3>
-        <div className="flex items-center space-x-4 text-xs">
-          <div className="flex items-center space-x-1">
+    <div className="bg-gray-800/50 rounded-xl p-5 border border-gray-700 relative overflow-hidden">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4 gap-3">
+        <h3 className="text-lg font-semibold text-gray-200 truncate">Gráfico de Candlestick - {symbol}</h3>
+        <div className="flex items-center space-x-3 sm:space-x-4 text-xs flex-wrap gap-2">
+          <div className="flex items-center space-x-1 whitespace-nowrap">
             <div className="w-3 h-0.5 bg-blue-400"></div>
             <span className="text-gray-400">EMA 9</span>
           </div>
-          <div className="flex items-center space-x-1">
+          <div className="flex items-center space-x-1 whitespace-nowrap">
             <div className="w-3 h-0.5 bg-orange-400"></div>
             <span className="text-gray-400">EMA 21</span>
           </div>
-          <div className="flex items-center space-x-1">
+          <div className="flex items-center space-x-1 whitespace-nowrap">
             <div className="w-3 h-0.5 bg-purple-400"></div>
             <span className="text-gray-400">EMA 200</span>
           </div>
