@@ -274,7 +274,7 @@ const CryptoCard: React.FC<CryptoCardProps> = ({ symbol, name, icon }) => {
                 </div>
                 <h3 className="text-sm sm:text-base md:text-lg font-semibold text-purple-200 truncate">Análise da IA</h3>
               </div>
-              <p className="text-purple-100 text-xs sm:text-sm leading-relaxed italic break-words">"{analysis.ai_comment}"</p>
+              <p className="text-purple-100 text-xs sm:text-sm leading-relaxed italic break-words">&ldquo;{analysis.ai_comment}&rdquo;</p>
             </div>
           )}
 

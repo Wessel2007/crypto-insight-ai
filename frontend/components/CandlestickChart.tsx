@@ -1,8 +1,8 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { createChart, ColorType } from 'lightweight-charts';
+import { createChart, ColorType, Time } from 'lightweight-charts';
 
 interface CandleData {
-  time: number;
+  time: Time;
   open: number;
   high: number;
   low: number;
